@@ -1,7 +1,9 @@
 name: slicey_navbar
-description: "A new Flutter project."
+description: "Slicey navbar."
 version: 0.0.1
-homepage:
+repository: https://github.com/bhavukar/slicey_navbar
+homepage: https://github.com/bhavukar/slicey_navbar
+issue_tracker: https://github.com/bhavukar/slicey_navbar/issues
 
 environment:
   sdk: ^3.8.0
