@@ -3,6 +3,7 @@
 A beautiful, animated carousel-style navigation bar for Flutter applications.
 
 
+![screen-20250529-002152 mp42](https://github.com/user-attachments/assets/4e7ccedf-f34c-4672-bd4e-c2ac45115c7f)
 
 ## Features
 
