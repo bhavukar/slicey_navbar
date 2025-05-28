@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'carousel_nav_bar_widget.dart';
 import 'carousel_nav_controller.dart';
 
@@ -14,7 +15,7 @@ enum NavBarAnimationType {
   scale,
 
   /// Slide transition between pages
-  slide
+  slide,
 }
 
 /// A beautiful, animated carousel-style navigation bar.
@@ -37,7 +38,10 @@ class CarouselNavBar extends StatefulWidget {
   final double scaleFactor;
 
   /// The background color of the navigation items.
-  final Color backgroundColor;
+  final Color navBarBackgroundColor;
+
+  /// The background color of the navigation items.
+  final Color itemBackgroundColor;
 
   /// The color of all icons when not selected.
   final Color? iconColor;
@@ -75,13 +79,15 @@ class CarouselNavBar extends StatefulWidget {
   /// Creates a carousel navigation bar.
   ///
   /// The [items] parameter must contain at least 2 navigation items.
-  const CarouselNavBar({super.key,
+  const CarouselNavBar({
+    super.key,
     required this.items,
     this.iconSize = 24,
     this.scaleFactor = 1.2,
-    this.backgroundColor = Colors.white,
+    this.itemBackgroundColor = Colors.white,
     this.iconColor,
     this.selectedIconColor,
+    this.navBarBackgroundColor = Colors.white,
     this.selectedBackgroundColor,
     this.shadowColor = Colors.black12,
     this.showShadow = true,
@@ -92,16 +98,18 @@ class CarouselNavBar extends StatefulWidget {
     this.pages,
     this.onItemSelected,
   }) : assert(items.length >= 2, 'At least 2 items required'),
-        assert(pages == null || pages.length == items.length,
-        'Number of pages must match number of nav items');
+       assert(
+         pages == null || pages.length == items.length,
+         'Number of pages must match number of nav items',
+       );
 
   @override
   State<CarouselNavBar> createState() => _CarouselNavBarState();
 }
 
 class _CarouselNavBarState extends State<CarouselNavBar> {
-  late PageController _navController;
-  late PageController? _pageController;
+  PageController? _navController;
+  PageController? _pageController;
   late int _selectedIndex;
   CarouselNavController? get _externalController => widget.controller;
 
@@ -127,17 +135,17 @@ class _CarouselNavBarState extends State<CarouselNavBar> {
 
   void _onItemTapped(int index) {
     setState(() => _selectedIndex = index);
-    _navController.animateToPage(
-        index,
-        duration: Duration(milliseconds: widget.animationDurationMs),
-        curve: Curves.easeInOut
+    _navController?.animateToPage(
+      index,
+      duration: Duration(milliseconds: widget.animationDurationMs),
+      curve: Curves.easeInOut,
     );
 
     if (_pageController != null) {
       _pageController!.animateToPage(
-          index,
-          duration: Duration(milliseconds: widget.animationDurationMs),
-          curve: Curves.easeInOut
+        index,
+        duration: Duration(milliseconds: widget.animationDurationMs),
+        curve: Curves.easeInOut,
       );
     }
 
@@ -154,69 +162,71 @@ class _CarouselNavBarState extends State<CarouselNavBar> {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 80,
-      child: PageView.builder(
-        controller: _navController,
-        itemCount: widget.items.length,
-        physics: widget.enableSwipe
-            ? const BouncingScrollPhysics()
-            : const NeverScrollableScrollPhysics(),
-        onPageChanged: _onPageChanged,
-        itemBuilder: (context, index) {
-          final item = widget.items[index];
-          final bool isSelected = index == _selectedIndex;
+    return PageView.builder(
+      controller: _navController,
+      itemCount: widget.items.length,
+      physics: widget.enableSwipe
+          ? const BouncingScrollPhysics()
+          : const NeverScrollableScrollPhysics(),
+      onPageChanged: _onPageChanged,
+      itemBuilder: (context, index) {
+        final item = widget.items[index];
+        final bool isSelected = index == _selectedIndex;
 
-          // Apply icon color if specified
-          Widget iconWidget = item.icon;
-          if (iconWidget is Icon && (widget.iconColor != null || widget.selectedIconColor != null)) {
-            final Icon icon = iconWidget;
-            iconWidget = Icon(
-              icon.icon,
-              size: icon.size ?? widget.iconSize,
-              color: isSelected
-                  ? widget.selectedIconColor ?? icon.color
-                  : widget.iconColor ?? icon.color,
-            );
-          }
+        // Apply icon color if specified
+        Widget iconWidget = item.icon;
+        if (iconWidget is Icon &&
+            (widget.iconColor != null || widget.selectedIconColor != null)) {
+          final Icon icon = iconWidget;
+          iconWidget = Icon(
+            icon.icon,
+            size: icon.size ?? widget.iconSize,
+            color: isSelected
+                ? widget.selectedIconColor ?? icon.color
+                : widget.iconColor ?? icon.color,
+          );
+        }
 
-          return GestureDetector(
-            onTap: () => _onItemTapped(index),
-            child: AnimatedScale(
-              scale: isSelected ? widget.scaleFactor : 0.9,
-              duration: Duration(milliseconds: widget.animationDurationMs),
-              child: Container(
-                margin: const EdgeInsets.symmetric(horizontal: 6),
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: isSelected
-                      ? widget.selectedBackgroundColor ?? widget.backgroundColor
-                      : widget.backgroundColor,
-                  shape: BoxShape.circle,
-                  boxShadow: widget.showShadow ? [
-                    BoxShadow(
-                      color: widget.shadowColor,
-                      blurRadius: 8,
-                      offset: const Offset(0, 4),
-                    ),
-                  ] : null,
-                ),
-                child: SizedBox(
-                  width: widget.iconSize,
-                  height: widget.iconSize,
-                  child: Center(child: iconWidget),
-                ),
+        return GestureDetector(
+          onTap: () => _onItemTapped(index),
+          child: AnimatedScale(
+            scale: isSelected ? widget.scaleFactor : 0.9,
+            duration: Duration(milliseconds: widget.animationDurationMs),
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 6),
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? widget.selectedBackgroundColor ??
+                          widget.itemBackgroundColor
+                    : widget.itemBackgroundColor,
+                shape: BoxShape.circle,
+                boxShadow: widget.showShadow
+                    ? [
+                        BoxShadow(
+                          color: widget.shadowColor,
+                          blurRadius: 25,
+                          spreadRadius: 2,
+                          offset: const Offset(0, 4),
+                        ),
+                      ]
+                    : null,
+              ),
+              child: SizedBox(
+                width: widget.iconSize,
+                height: widget.iconSize,
+                child: Center(child: iconWidget),
               ),
             ),
-          );
-        },
-      ),
+          ),
+        );
+      },
     );
   }
 
   @override
   void dispose() {
-    _navController.dispose();
+    _navController?.dispose();
     _pageController?.dispose();
     super.dispose();
   }
@@ -233,19 +243,21 @@ class CarouselNavScaffold extends StatefulWidget {
   final List<Widget> pages;
 
   /// Creates a scaffold with a CarouselNavBar
-   CarouselNavScaffold({
+  CarouselNavScaffold({
     super.key,
     required this.navigationBar,
     required this.pages,
-  }) : assert(navigationBar.items.length == pages.length,
-  'Number of pages must match number of nav items');
+  }) : assert(
+         navigationBar.items.length == pages.length,
+         'Number of pages must match number of nav items',
+       );
 
   @override
   State<CarouselNavScaffold> createState() => _CarouselNavScaffoldState();
 }
 
 class _CarouselNavScaffoldState extends State<CarouselNavScaffold> {
-  late PageController _pageController;
+  PageController? _pageController;
   late CarouselNavController _navController;
   int _selectedIndex = 0;
 
@@ -259,7 +271,7 @@ class _CarouselNavScaffoldState extends State<CarouselNavScaffold> {
     _navController.addListener(() {
       if (_navController.index != _selectedIndex) {
         setState(() => _selectedIndex = _navController.index);
-        _pageController.animateToPage(
+        _pageController?.animateToPage(
           _selectedIndex,
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeInOut,
@@ -277,32 +289,40 @@ class _CarouselNavScaffoldState extends State<CarouselNavScaffold> {
       case NavBarAnimationType.fade:
         return AnimatedOpacity(
           opacity: isCurrentPage ? 1.0 : 0.0,
-          duration: Duration(milliseconds: widget.navigationBar.animationDurationMs),
+          duration: Duration(
+            milliseconds: widget.navigationBar.animationDurationMs,
+          ),
           child: page,
         );
 
       case NavBarAnimationType.scale:
         return AnimatedScale(
           scale: isCurrentPage ? 1.0 : 0.8,
-          duration: Duration(milliseconds: widget.navigationBar.animationDurationMs),
+          duration: Duration(
+            milliseconds: widget.navigationBar.animationDurationMs,
+          ),
           child: page,
         );
 
       case NavBarAnimationType.slide:
         return AnimatedSlide(
           offset: isCurrentPage ? Offset.zero : const Offset(0.1, 0),
-          duration: Duration(milliseconds: widget.navigationBar.animationDurationMs),
+          duration: Duration(
+            milliseconds: widget.navigationBar.animationDurationMs,
+          ),
           child: page,
         );
 
       case NavBarAnimationType.linear:
-      return page;
+        return page;
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBody: true,
+      extendBodyBehindAppBar: true,
       body: PageView.builder(
         controller: _pageController,
         physics: widget.navigationBar.enableSwipe
@@ -315,7 +335,12 @@ class _CarouselNavScaffoldState extends State<CarouselNavScaffold> {
         },
         itemBuilder: (context, index) => _buildPageTransition(context, index),
       ),
-      bottomNavigationBar: widget.navigationBar,
+      bottomNavigationBar: BottomAppBar(
+        padding: EdgeInsets.zero,
+        height: kBottomNavigationBarHeight + 100, // Add some padding
+        color: widget.navigationBar.navBarBackgroundColor,
+        child: widget.navigationBar,
+      ),
     );
   }
 
@@ -325,7 +350,7 @@ class _CarouselNavScaffoldState extends State<CarouselNavScaffold> {
     if (widget.navigationBar.controller == null) {
       _navController.dispose();
     }
-    _pageController.dispose();
+    _pageController?.dispose();
     super.dispose();
   }
 }

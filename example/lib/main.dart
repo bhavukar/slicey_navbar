@@ -12,7 +12,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Slicey NavBar Demo',
-      theme: ThemeData(colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple)),
+      debugShowCheckedModeBanner: false,
       home: const NavBarDemo(),
     );
   }
@@ -26,15 +26,41 @@ class NavBarDemo extends StatefulWidget {
 }
 
 class _NavBarDemoState extends State<NavBarDemo> {
-  final CarouselNavController controller = CarouselNavController();
+  final controller = CarouselNavController();
   int _selectedIndex = 0;
 
   final List<Widget> _pages = [
-    const _DemoPage(title: 'Home', icon: Icons.home),
-    const _DemoPage(title: 'Search', icon: Icons.search),
-    const _DemoPage(title: 'Profile', icon: Icons.person),
-    _DemoPage(title: 'Settings', icon: Icons.settings),
+    const _DemoPage(
+      title: 'Home',
+      icon: Icons.home,
+      backgroundColor: Colors.white,
+    ),
+    const _DemoPage(
+      title: 'Search',
+      icon: Icons.search,
+      backgroundColor: Colors.white,
+    ),
+    const _DemoPage(
+      title: 'Profile',
+      icon: Icons.person,
+      backgroundColor: Colors.white,
+    ),
+    _DemoPage(
+      title: 'Settings',
+      icon: Icons.settings,
+      backgroundColor: Colors.white,
+    ),
   ];
+
+  @override
+  void initState() {
+    controller.addListener(() {
+      setState(() {
+        _selectedIndex = controller.index;
+      });
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,10 +68,11 @@ class _NavBarDemoState extends State<NavBarDemo> {
       pages: _pages,
       navigationBar: CarouselNavBar(
         controller: controller,
-        backgroundColor: Colors.white,
+        itemBackgroundColor: Colors.white,
+        navBarBackgroundColor: Colors.transparent,
         shadowColor: Colors.black.withOpacity(0.1),
         iconColor: Colors.grey,
-        selectedIconColor: Colors.blue,
+        selectedIconColor: Colors.black,
         scaleFactor: 1,
         iconSize: 26,
         onItemSelected: (index) {
@@ -73,21 +100,34 @@ class _NavBarDemoState extends State<NavBarDemo> {
 class _DemoPage extends StatelessWidget {
   final String title;
   final IconData icon;
+  final Color backgroundColor;
 
-  const _DemoPage({required this.title, required this.icon});
+  const _DemoPage({
+    required this.title,
+    required this.icon,
+    required this.backgroundColor,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 80),
-            const SizedBox(height: 16),
-            Text(title, style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold)),
-          ],
+    return Material(
+      color: backgroundColor,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, size: 80),
+              const SizedBox(height: 16),
+              Text(
+                title,
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
