@@ -1,6 +1,8 @@
-## 0.0.1
+## 0.0.2
 
-* Initial release with support for animated carousel navigation
-* Multiple animation types: linear, fade, scale, slide
-* Custom styling options for icons, backgrounds, and shadows
-* Support for programmatic navigation with controller
+- Animated carousel navigation
+- Multiple animation types: linear, fade, scale, slide
+- Custom styling for icons, backgrounds, and shadows
+- Programmatic navigation with controller
+
+
